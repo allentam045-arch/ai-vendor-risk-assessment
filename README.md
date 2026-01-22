@@ -47,11 +47,6 @@ This tool is provided for educational and demonstration purposes only.
 AI-generated assessments are exploratory and may not always be accurate.  
 They should not be used as the sole basis for security, compliance, or risk decisions. All outputs should still be reviewed for accuracy.
 
-## How to Run Locally
-
-```bash
-pip install -r requirements.txt
-streamlit run app.py
 
 ## Screenshots
 
@@ -82,3 +77,9 @@ After the questionnaire is analyzed, the AI provides a risk assessment, framewor
 ![AI Analysis Output - Part 1](screenshots/results_screenshot_1.png)
 ![AI Analysis Output - Part 2](screenshots/results_screenshot_2.png)
 ![AI Analysis Output - Part 3](screenshots/results_screenshot_3.png)
+
+## How to Run Locally
+
+```bash
+pip install -r requirements.txt
+streamlit run app.py
