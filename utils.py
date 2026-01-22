@@ -1,5 +1,5 @@
 # utils.py
-# Helper functions for text extraction and AI-assisted vendor risk assessment
+# Helper functions for text extraction and AI-assisted vendor risk assessment (AI-only)
 
 import pdfplumber
 from docx import Document
@@ -10,78 +10,16 @@ from openai import OpenAI
 client = OpenAI()
 
 # --------------------------------------------------
-# KEYWORD-BASED RISK DOMAINS (DETECTION LAYER)
-# --------------------------------------------------
-
-RISK_DOMAINS = {
-    "Identity & Access Management": [
-        "no mfa",
-        "shared account",
-        "weak password",
-        "no access review"
-    ],
-    "Logging & Monitoring": [
-        "audit logs reviewed every",
-        "logs reviewed every",
-        "no log review"
-    ],
-    "Incident Response": [
-        "no incident response",
-        "no ir plan",
-        "no incident plan"
-    ],
-    "Data Protection": [
-        "no encryption",
-        "unencrypted data"
-    ],
-    "Vulnerability Management": [
-        "no vulnerability scan",
-        "no patching",
-        "no patch management"
-    ],
-    "Governance & Risk": [
-        "no security program",
-        "no risk assessment",
-        "no policies"
-    ],
-}
-
-# --------------------------------------------------
-# MAIN RISK ASSESSMENT FUNCTION (AI + KEYWORDS)
+# MAIN RISK ASSESSMENT FUNCTION (AI-ONLY)
 # --------------------------------------------------
 
 def assess_risk(text):
     """
-    Performs vendor risk assessment using:
-    1) Keyword-based detection
-    2) AI-driven qualitative explanation aligned to standards
-
+    Performs vendor risk assessment using AI-driven qualitative explanation aligned to standards.
     Returns:
-    - risk_score (int)
-    - risk_level (Low / Medium / High)
-    - detected_issues (list)
     - ai_explanation (str)
     """
 
-    text_lower = text.lower()
-    detected_issues = []
-
-    # --- Step 1: Keyword detection ---
-    for category, keywords in RISK_DOMAINS.items():
-        for keyword in keywords:
-            if keyword in text_lower:
-                detected_issues.append(f"{category}: {keyword}")
-
-    risk_score = len(detected_issues)
-
-    if risk_score <= 2:
-        risk_level = "Low"
-    elif risk_score <= 5:
-        risk_level = "Medium"
-    else:
-        risk_level = "High"
-
-    # --- Step 2: AI qualitative explanation ---
     ai_prompt = f"""
 You are a cybersecurity risk assessor specializing in third-party vendor reviews.
 
@@ -89,20 +27,23 @@ The following text is from a vendor questionnaire or policy document:
 
 {text}
 
-Detected issues (from automated review):
-{detected_issues if detected_issues else "No explicit keyword-based issues detected."}
-
-Instructions:
-1. Identify the relevant security or compliance control areas (e.g., logging, access control).
-2. Evaluate whether the described practices align with common industry expectations such as:
+Your task:
+1. Identify security or compliance control gaps or weaknesses.
+2. Map each finding to common industry frameworks where applicable:
    - NIST SP 800-53 / 800-92
    - ISO/IEC 27001
-   - SOC 2
-3. If timeframes, frequencies, or practices are weak, outdated, or vague, clearly explain WHY.
-   Example: Audit log reviews occurring every 5 years are inconsistent with industry norms.
-4. Describe the potential risk or impact of the gaps identified.
+   - SOC 2 Trust Services Criteria
+3. Evaluate whether described practices meet industry norms.
+   - If timelines, frequencies, or controls are weak or vague, explain why.
+4. Assign a risk rating (Low / Medium / High).
+5. Provide **clear, actionable remediation recommendations** appropriate for a third-party vendor.
 
-Respond using the following structure:
+IMPORTANT:
+- Be practical and realistic (do not assume unlimited resources).
+- Avoid generic advice like “improve security.”
+- If no significant risk is identified, clearly state that.
+
+Respond using this exact structure for EACH finding:
 
 Control Area:
 <name>
@@ -110,17 +51,21 @@ Control Area:
 Framework Mapping:
 - NIST: <control IDs if applicable>
 - ISO/IEC 27001: <control IDs if applicable>
-- SOC 2: <control criteria if applicable>
+- SOC 2: <criteria if applicable>
 
-Assessment:
-<brief assessment>
+Finding:
+<what is missing or weak>
 
 Risk Explanation:
-<why this is a risk and impact>
+<why this matters and potential impact>
 
 Risk Rating:
 Low / Medium / High
 
+Recommended Remediation:
+<specific actions the vendor should take>
+
+If multiple findings exist, separate them clearly.
 """
 
     response = client.chat.completions.create(
@@ -130,8 +75,8 @@ Low / Medium / High
     )
 
     ai_explanation = response.choices[0].message.content
+    return ai_explanation
 
-    return risk_score, risk_level, detected_issues, ai_explanation
 
 # --------------------------------------------------
 # TEXT EXTRACTION FUNCTIONS
@@ -161,15 +106,10 @@ def extract_excel_text(file):
     """
     xls = pd.ExcelFile(file)
     all_text = ""
-
     for sheet_name in xls.sheet_names:
         df = pd.read_excel(xls, sheet_name)
         all_text += (
-            df.fillna("")
-            .astype(str)
-            .agg(" ".join, axis=1)
-            .str.cat(sep="\n")
+            df.fillna("").astype(str).agg(" ".join, axis=1).str.cat(sep="\n")
         )
         all_text += "\n"
-
     return all_text
