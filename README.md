@@ -65,20 +65,20 @@ Shows the app being executed in PyCharm’s terminal.
 ### 2️⃣ Upload Interface
 The user-friendly Streamlit interface where vendor documents (PDF, Word, Excel, TXT) are uploaded.
 
-![Upload Interface - Part 1](screenshots/initial_browser_screenshot.jpg)
-![Upload Interface - Part 2](screenshots/file_upload_screenshot.jpg)
+![Upload Interface - Part 1](screenshots/initial_browser_screenshot.pngg)
+![Upload Interface - Part 2](screenshots/file_upload_screenshot.png)
 ---
 
 ### 3️⃣ Sample Vendor Questionnaire (Test Data)
 Example of a test questionnaire file loaded into the app, showing the questions and responses used for analysis.
 
-![Test Questionnaire - Part 1](screenshots/question_screenshot_1.jpg)
-![Test Questionnaire - Part 2](screenshots/question_screenshot_2.jpg)
+![Test Questionnaire - Part 1](screenshots/question_screenshot_1.png)
+![Test Questionnaire - Part 2](screenshots/question_screenshot_2.png)
 ---
 
 ### 4️⃣ AI Risk Analysis Output
 After the questionnaire is analyzed, the AI provides a risk assessment, framework mapping, and automated remediation recommendations.
 
-![AI Analysis Output - Part 1](screenshots/results_screenshot_1.jpg)
-![AI Analysis Output - Part 2](screenshots/results_screenshot_2.jpg)
-![AI Analysis Output - Part 3](screenshots/results_screenshot_3.jpg)
+![AI Analysis Output - Part 1](screenshots/results_screenshot_1.png)
+![AI Analysis Output - Part 2](screenshots/results_screenshot_2.png)
+![AI Analysis Output - Part 3](screenshots/results_screenshot_3.png)
